@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-ink-950 text-ink-100 antialiased;
+    background-image:
+      radial-gradient(
+        ellipse 80% 50% at 50% -10%,
+        rgba(6, 182, 212, 0.15),
+        transparent 60%
+      ),
+      radial-gradient(
+        ellipse 60% 40% at 80% 110%,
+        rgba(6, 182, 212, 0.08),
+        transparent 50%
+      );
+    background-attachment: fixed;
+  }
+
+  /* Seleção de texto com cor do brand */
+  ::selection {
+    @apply bg-brand-500/30 text-white;
+  }
+
+  /* Scrollbar customizada (chrome-based) */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-ink-900;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-ink-700 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-ink-600;
+  }
+}
+
+@layer components {
+  .container-wide {
+    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2
+           rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold
+           text-ink-950 transition-all
+           hover:bg-brand-400 hover:shadow-lg hover:shadow-brand-500/20
+           focus:outline-none focus:ring-2 focus:ring-brand-400 focus:ring-offset-2 focus:ring-offset-ink-950;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2
+           rounded-lg border border-ink-700 bg-ink-900/50 px-5 py-2.5 text-sm font-semibold
+           text-ink-100 backdrop-blur transition-all
+           hover:border-brand-500/50 hover:bg-ink-800
+           focus:outline-none focus:ring-2 focus:ring-brand-400;
+  }
+
+  .card {
+    @apply rounded-2xl border border-ink-800 bg-ink-900/40 backdrop-blur
+           transition-all duration-300
+           hover:border-ink-700 hover:bg-ink-900/60;
+  }
+
+  .tag {
+    @apply inline-flex items-center rounded-full border border-brand-500/30
+           bg-brand-500/10 px-2.5 py-0.5 text-xs font-medium text-brand-300;
+  }
+}
