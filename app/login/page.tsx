@@ -64,7 +64,7 @@ export default function LoginPage() {
             </div>
 
             {/* Formulário (desabilitado — integração virá na próxima etapa) */}
-            <form className="mt-8 space-y-4" onSubmit={(e) => e.preventDefault()}>
+            <form className="mt-8 space-y-4" action="/login">
               <div>
                 <label
                   htmlFor="email"
