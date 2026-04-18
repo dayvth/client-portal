@@ -154,7 +154,7 @@ export default function DashboardPage() {
                 <p className="mt-1 text-sm text-ink-400">
                   Algum problema ou duvida? Fala direto comigo no WhatsApp.
                 </p>
-                
+                <a
                   href="https://wa.me/447748916229"
                   target="_blank"
                   rel="noopener noreferrer"
