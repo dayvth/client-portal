@@ -4,12 +4,13 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import type { Profile } from "@/lib/supabase";
+import type { Profile, Landpage } from "@/lib/supabase";
 
 export default function DashboardPage() {
   const router = useRouter();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [email, setEmail] = useState("");
+  const [landpages, setLandpages] = useState<Landpage[]>([]);
   const [carregando, setCarregando] = useState(true);
 
   useEffect(() => {
@@ -25,13 +26,21 @@ export default function DashboardPage() {
 
       setEmail(session.user.email ?? "");
 
-      const { data } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", session.user.id)
-        .single();
+      const [profileRes, landpagesRes] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", session.user.id)
+          .single(),
+        supabase
+          .from("landpages")
+          .select("*")
+          .eq("cliente_id", session.user.id)
+          .order("ordem", { ascending: true }),
+      ]);
 
-      setProfile(data);
+      setProfile(profileRes.data);
+      setLandpages(landpagesRes.data ?? []);
       setCarregando(false);
     };
 
@@ -96,39 +105,110 @@ export default function DashboardPage() {
               Ola, {nomeExibicao}
             </h1>
             <p className="mt-3 max-w-xl text-ink-400">
-              Bem-vindo a sua area de gerenciamento. Aqui voce vai poder
-              editar sua landpage, trocar imagens, ajustar textos e publicar
-              as mudancas sempre que quiser.
+              Escolha uma landpage abaixo para editar textos, imagens, cores
+              e links. Voce pode salvar rascunho quantas vezes quiser.
             </p>
           </div>
 
-          <div className="mt-10 card p-8 text-center sm:p-10">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500/10 ring-1 ring-brand-500/20">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="28"
-                height="28"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="text-brand-300"
-              >
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                <polyline points="9 22 9 12 15 12 15 22" />
-              </svg>
+          <div className="mt-10">
+            <div className="mb-4 flex items-end justify-between">
+              <h2 className="text-lg font-semibold">Suas landpages</h2>
+              <span className="text-xs text-ink-500">
+                {landpages.length}{" "}
+                {landpages.length === 1 ? "site" : "sites"}
+              </span>
             </div>
-            <h2 className="mt-5 text-lg font-semibold">Suas landpages</h2>
-            <p className="mx-auto mt-2 max-w-md text-sm text-ink-400">
-              Em breve aqui vai aparecer a lista das suas landpages com um
-              botao de edicao em cada uma.
-            </p>
-            <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-ink-700 bg-ink-900/60 px-3 py-1 text-xs text-ink-400">
-              <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-              Em construcao
-            </div>
+
+            {landpages.length === 0 ? (
+              <div className="card p-8 text-center sm:p-10">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-ink-800/60 ring-1 ring-ink-700">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="28"
+                    height="28"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-ink-400"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                </div>
+                <h3 className="mt-5 text-base font-semibold">
+                  Nenhuma landpage cadastrada ainda
+                </h3>
+                <p className="mx-auto mt-2 max-w-md text-sm text-ink-400">
+                  Fala comigo no WhatsApp que eu cadastro a sua landpage
+                  aqui pra voce poder editar.
+                </p>
+                
+                  href="https://wa.me/447748916229"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-brand-400 transition-colors hover:text-brand-300"
+                >
+                  Abrir WhatsApp
+                </a>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {landpages.map((lp) => (
+                  <div
+                    key={lp.id}
+                    className="card p-5 transition-colors hover:border-brand-500/40"
+                  >
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <h3 className="truncate text-base font-semibold">
+                            {lp.nome}
+                          </h3>
+                          {!lp.publico && (
+                            <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-amber-300">
+                              Rascunho
+                            </span>
+                          )}
+                        </div>
+                        {lp.descricao && (
+                          <p className="mt-1 text-sm text-ink-400">
+                            {lp.descricao}
+                          </p>
+                        )}
+                        <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+                          {lp.categoria && (
+                            <span className="tag">{lp.categoria}</span>
+                          )}
+                          {lp.dominio && (
+                            
+                              href={`https://${lp.dominio}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-ink-400 transition-colors hover:text-brand-400"
+                            >
+                              {lp.dominio}
+                            </a>
+                          )}
+                          {lp.ano && (
+                            <span className="text-ink-500">{lp.ano}</span>
+                          )}
+                        </div>
+                      </div>
+                      <Link
+                        href={`/editar/${lp.id}`}
+                        className="btn-primary w-full justify-center px-4 py-2 text-sm sm:w-auto"
+                      >
+                        Editar
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="mt-6 rounded-xl border border-ink-800 bg-ink-900/40 p-5">
@@ -154,7 +234,7 @@ export default function DashboardPage() {
                 <p className="mt-1 text-sm text-ink-400">
                   Algum problema ou duvida? Fala direto comigo no WhatsApp.
                 </p>
-                <a
+                
                   href="https://wa.me/447748916229"
                   target="_blank"
                   rel="noopener noreferrer"
