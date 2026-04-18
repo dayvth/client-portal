@@ -235,7 +235,7 @@ export default function DashboardPage() {
                   Algum problema ou duvida? Fala direto comigo no WhatsApp.
                 </p>
                 
-                  href="https://wa.me/447748916229"
+                  <a href="https://wa.me/447748916229"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-brand-400 transition-colors hover:text-brand-300"
