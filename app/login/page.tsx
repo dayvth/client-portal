@@ -2,21 +2,10 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import type { FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
-/**
- * Página de login real — autentica via Supabase Auth.
- *
- * "use client" é obrigatório aqui porque o formulário tem estado
- * (email, senha, erros) e chama a API do Supabase direto no navegador.
- *
- * Fluxo:
- *  1. Usuário digita email+senha e submete.
- *  2. supabase.auth.signInWithPassword valida contra auth.users.
- *  3. Se deu certo, redireciona pra /dashboard.
- *  4. Se deu errado, mostra mensagem amigável (sem vazar detalhe técnico).
- */
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -24,7 +13,7 @@ export default function LoginPage() {
   const [erro, setErro] = useState<string | null>(null);
   const [carregando, setCarregando] = useState(false);
 
-  async function handleLogin(e: React.FormEvent) {
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErro(null);
     setCarregando(true);
@@ -37,18 +26,16 @@ export default function LoginPage() {
     setCarregando(false);
 
     if (error) {
-      setErro("Email ou senha inválidos. Tente novamente.");
+      setErro("Email ou senha invalidos. Tente novamente.");
       return;
     }
 
-    // Login bem-sucedido — vai pra área logada
     router.push("/dashboard");
     router.refresh();
-  }
+  };
 
   return (
     <div className="flex min-h-screen flex-col">
-      {/* Header minimalista */}
       <header className="border-b border-ink-800/60">
         <div className="container-wide flex h-16 items-center justify-between">
           <Link
@@ -66,12 +53,11 @@ export default function LoginPage() {
             href="/"
             className="text-sm text-ink-400 transition-colors hover:text-white"
           >
-            ← Voltar ao site
+            Voltar ao site
           </Link>
         </div>
       </header>
 
-      {/* Conteúdo */}
       <main className="flex flex-1 items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
           <div className="card p-8 sm:p-10">
@@ -101,7 +87,6 @@ export default function LoginPage() {
               </p>
             </div>
 
-            {/* Formulário de login (funcional) */}
             <form onSubmit={handleLogin} className="mt-8 space-y-4">
               <div>
                 <label
@@ -133,7 +118,7 @@ export default function LoginPage() {
                 <input
                   id="senha"
                   type="password"
-                  placeholder="••••••••"
+                  placeholder="senha"
                   required
                   autoComplete="current-password"
                   value={senha}
@@ -143,7 +128,6 @@ export default function LoginPage() {
                 />
               </div>
 
-              {/* Mensagem de erro (só aparece se tiver erro) */}
               {erro && (
                 <div
                   role="alert"
