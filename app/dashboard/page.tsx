@@ -146,7 +146,7 @@ export default function DashboardPage() {
                   Fala comigo no WhatsApp que eu cadastro a sua landpage
                   aqui pra voce poder editar.
                 </p>
-                
+                <a
                   href="https://wa.me/447748916229"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -184,7 +184,7 @@ export default function DashboardPage() {
                             <span className="tag">{lp.categoria}</span>
                           )}
                           {lp.dominio && (
-                            
+                            <a
                               href={`https://${lp.dominio}`}
                               target="_blank"
                               rel="noopener noreferrer"
@@ -234,8 +234,8 @@ export default function DashboardPage() {
                 <p className="mt-1 text-sm text-ink-400">
                   Algum problema ou duvida? Fala direto comigo no WhatsApp.
                 </p>
-                
-                  <a href="https://wa.me/447748916229"
+                <a
+                  href="https://wa.me/447748916229"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-brand-400 transition-colors hover:text-brand-300"
