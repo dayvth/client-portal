@@ -148,7 +148,7 @@ export default function LoginPage() {
 
             <p className="mt-6 text-center text-xs text-ink-500">
               Problemas para entrar?{" "}
-              
+              <a
                 href="https://wa.me/447748916229"
                 target="_blank"
                 rel="noopener noreferrer"
