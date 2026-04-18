@@ -1,13 +1,51 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 /**
- * Página de login — stub visual.
+ * Página de login real — autentica via Supabase Auth.
  *
- * Integração real com Supabase Auth será feita na próxima etapa.
- * Por ora, o formulário é só visual para validar o fluxo de navegação
- * e o design da área logada.
+ * "use client" é obrigatório aqui porque o formulário tem estado
+ * (email, senha, erros) e chama a API do Supabase direto no navegador.
+ *
+ * Fluxo:
+ *  1. Usuário digita email+senha e submete.
+ *  2. supabase.auth.signInWithPassword valida contra auth.users.
+ *  3. Se deu certo, redireciona pra /dashboard.
+ *  4. Se deu errado, mostra mensagem amigável (sem vazar detalhe técnico).
  */
 export default function LoginPage() {
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [erro, setErro] = useState<string | null>(null);
+  const [carregando, setCarregando] = useState(false);
+
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    setErro(null);
+    setCarregando(true);
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password: senha,
+    });
+
+    setCarregando(false);
+
+    if (error) {
+      setErro("Email ou senha inválidos. Tente novamente.");
+      return;
+    }
+
+    // Login bem-sucedido — vai pra área logada
+    router.push("/dashboard");
+    router.refresh();
+  }
+
   return (
     <div className="flex min-h-screen flex-col">
       {/* Header minimalista */}
@@ -63,8 +101,8 @@ export default function LoginPage() {
               </p>
             </div>
 
-            {/* Formulário (desabilitado — integração virá na próxima etapa) */}
-            <form className="mt-8 space-y-4" action="/login">
+            {/* Formulário de login (funcional) */}
+            <form onSubmit={handleLogin} className="mt-8 space-y-4">
               <div>
                 <label
                   htmlFor="email"
@@ -76,7 +114,11 @@ export default function LoginPage() {
                   id="email"
                   type="email"
                   placeholder="seu@email.com"
-                  disabled
+                  required
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={carregando}
                   className="mt-1.5 block w-full rounded-lg border border-ink-700 bg-ink-900/60 px-4 py-2.5 text-sm text-white placeholder:text-ink-500 focus:border-brand-400 focus:outline-none focus:ring-1 focus:ring-brand-400 disabled:cursor-not-allowed disabled:opacity-60"
                 />
               </div>
@@ -92,29 +134,37 @@ export default function LoginPage() {
                   id="senha"
                   type="password"
                   placeholder="••••••••"
-                  disabled
+                  required
+                  autoComplete="current-password"
+                  value={senha}
+                  onChange={(e) => setSenha(e.target.value)}
+                  disabled={carregando}
                   className="mt-1.5 block w-full rounded-lg border border-ink-700 bg-ink-900/60 px-4 py-2.5 text-sm text-white placeholder:text-ink-500 focus:border-brand-400 focus:outline-none focus:ring-1 focus:ring-brand-400 disabled:cursor-not-allowed disabled:opacity-60"
                 />
               </div>
 
+              {/* Mensagem de erro (só aparece se tiver erro) */}
+              {erro && (
+                <div
+                  role="alert"
+                  className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-200"
+                >
+                  {erro}
+                </div>
+              )}
+
               <button
                 type="submit"
-                disabled
+                disabled={carregando}
                 className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Entrar
+                {carregando ? "Entrando..." : "Entrar"}
               </button>
             </form>
 
-            {/* Aviso: integração ainda não foi feita */}
-            <div className="mt-6 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-200">
-              <strong>Em construção:</strong> o login será ativado na próxima
-              etapa com Supabase Auth.
-            </div>
-
             <p className="mt-6 text-center text-xs text-ink-500">
               Problemas para entrar?{" "}
-              <a
+              
                 href="https://wa.me/447748916229"
                 target="_blank"
                 rel="noopener noreferrer"
